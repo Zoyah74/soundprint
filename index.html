@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Soundprint</title>
+    <link rel="stylesheet" href="./style.css" />
+
+    <!-- p5 + p5.sound -->
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.9.4/lib/p5.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/p5@1.9.4/lib/addons/p5.sound.min.js"></script>
+  </head>
+
+  <body>
+    <div class="app">
+      <!-- LEFT: Canvas -->
+      <section class="left">
+        <div class="canvas-shell">
+          <div id="p5-mount"></div>
+        </div>
+      </section>
+
+      <!-- RIGHT: Controls + Gallery -->
+      <aside class="right">
+        <div class="panel">
+          <!-- Title -->
+          <h1 class="title">
+            <span class="title-solid">Sound</span>
+            <span class="title-outline">print</span>
+          </h1>
+
+          <!-- Style row -->
+          <div class="section">
+            <div class="section-label">Choose your style</div>
+            <div class="pill-row" role="tablist" aria-label="Style">
+              <button class="pill-btn is-active" data-style="iris" type="button">Iris</button>
+              <button class="pill-btn" data-style="ribbon" type="button">Ribbon Petals</button>
+              <button class="pill-btn" data-style="bloom" type="button">Bloom</button>
+            </div>
+
+            <div class="toggle-row">
+              <span class="toggle-label">Light background</span>
+              <label class="switch">
+                <input id="bgToggle" type="checkbox" />
+                <span class="slider"></span>
+              </label>
+            </div>
+          </div>
+
+          <!-- Upload -->
+          <div class="section">
+            <div class="section-label">Add an audio file</div>
+            <label class="file-btn pill">
+              <span>Choose file</span>
+              <input id="audioFile" type="file" accept="audio/*" />
+            </label>
+          </div>
+
+          <!-- Playback -->
+          <div class="section">
+            <div class="section-label">Create your visual</div>
+            <div class="row3">
+              <button id="playBtn" class="btn pill" type="button">Play</button>
+              <button id="pauseBtn" class="btn pill" type="button">Pause</button>
+              <button id="restartBtn" class="btn pill" type="button">Restart</button>
+            </div>
+
+            <div class="meta">
+              <div id="status">Upload an audio file to begin.</div>
+              <div id="nowPlaying"></div>
+            </div>
+          </div>
+
+          <!-- Export -->
+          <div class="section">
+            <div class="section-label">Export</div>
+            <div class="row2">
+              <button id="addGalleryBtn" class="btn pill" type="button">Add to gallery</button>
+              <button id="saveBtn" class="btn pill primary" type="button">Save image</button>
+            </div>
+          </div>
+
+          <!-- Gallery -->
+          <div class="section gallery-head">
+            <div class="gallery-title">Gallery</div>
+            <div class="sub-actions">
+              <button id="clearBtn" class="btn pill ghost" type="button">Clear</button>
+              <button id="exportBtn" class="btn pill ghost" type="button">Export</button>
+            </div>
+          </div>
+
+          <div id="gallery" class="gallery"></div>
+        </div>
+      </aside>
+    </div>
+
+    <script src="./sketch.js"></script>
+    <script src="./main.js"></script>
+  </body>
+</html>

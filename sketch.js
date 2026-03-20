@@ -617,6 +617,8 @@
     fft: null,
     started: false,
     finished: false,
+    paused: false,
+    pauseTime: 0,
     filename: "",
     onStatus: () => {},
     onEnded: () => {},
@@ -841,7 +843,13 @@
         bgClear();
       }
 
-      function finalize() {
+      let playGen = 0;
+
+      function finalize(gen) {
+        // Ignore stale onended from a previous play/stop cycle
+        if (gen !== playGen) return;
+        if (state.paused) return;
+
         state.finished = true;
         state.started = false;
 
@@ -914,21 +922,39 @@
           clearCanvas();
           state.started = true;
           state.finished = false;
+          state.paused = false;
+          state.pauseTime = 0;
+
+          const gen = ++playGen;
 
           state.soundFile.stop();
           state.soundFile.play();
           state.soundFile.setLoop(false);
 
-          state.soundFile.onended(() => finalize());
+          state.soundFile.onended(() => finalize(gen));
 
           state.onStatus("Generating…");
         },
 
         pause() {
           if (state.soundFile?.isPlaying()) {
+            state.paused = true;
+            state.pauseTime = state.soundFile.currentTime();
             state.soundFile.pause();
             state.onStatus("Paused.");
           }
+        },
+
+        resume() {
+          if (!state.soundFile) return;
+          state.paused = false;
+          state.finished = false;
+          state.started = true;
+          p.userStartAudio();
+          const gen = ++playGen;
+          state.soundFile.play(0, 1, 1, state.pauseTime);
+          state.soundFile.onended(() => finalize(gen));
+          state.onStatus("Generating…");
         },
 
         setStyle(style) {

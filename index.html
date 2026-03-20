@@ -4,15 +4,22 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Soundprint</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Syne:wght@700;800&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet" />
+
     <link rel="stylesheet" href="./style.css" />
 
     <!-- p5 + p5.sound -->
     <script src="https://cdn.jsdelivr.net/npm/p5@1.9.4/lib/p5.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/p5@1.9.4/lib/addons/p5.sound.min.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/jsmediatags@3.9.7/dist/jsmediatags.min.js"></script>
   </head>
 
   <body>
     <div class="app">
+
       <!-- LEFT: Canvas -->
       <section class="left">
         <div class="canvas-shell">
@@ -20,24 +27,35 @@
         </div>
       </section>
 
-      <!-- RIGHT: Controls + Gallery -->
+      <!-- RIGHT: Controls -->
       <aside class="right">
         <div class="panel">
-          <!-- Title -->
-          <h1 class="title">
-            <span class="title-solid">Sound</span>
-            <span class="title-outline">print</span>
-          </h1>
 
-          <!-- Style row -->
+          <!-- Wordmark -->
+          <header class="panel-top">
+            <h1 class="title">
+              <span class="title-solid">Sound</span><span class="title-outline">print</span>
+            </h1>
+            <p class="tagline">turn audio into art</p>
+          </header>
+
+          <!-- Style -->
           <div class="section">
-            <div class="section-label">Choose your style</div>
-            <div class="pill-row" role="tablist" aria-label="Style">
-              <button class="pill-btn is-active" data-style="iris" type="button">Iris</button>
-              <button class="pill-btn" data-style="ribbon" type="button">Ribbon Petals</button>
-              <button class="pill-btn" data-style="bloom" type="button">Bloom</button>
+            <div class="section-label">Visualization</div>
+            <div class="style-grid" role="tablist" aria-label="Style">
+              <button class="style-btn is-active" data-style="iris" type="button">
+                <svg class="style-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><line x1="12" y1="3" x2="12" y2="7"/><line x1="12" y1="17" x2="12" y2="21"/><line x1="3" y1="12" x2="7" y2="12"/><line x1="17" y1="12" x2="21" y2="12"/></svg>
+                <span>Iris</span>
+              </button>
+              <button class="style-btn" data-style="ribbon" type="button">
+                <svg class="style-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 12c0-5 3.5-9 9-9s9 4 9 9-3.5 9-9 9"/><path d="M12 3c2 3 3 6 3 9s-1 6-3 9"/><path d="M12 3c-2 3-3 6-3 9s1 6 3 9"/></svg>
+                <span>Ribbon Petals</span>
+              </button>
+              <button class="style-btn" data-style="bloom" type="button">
+                <svg class="style-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><circle cx="12" cy="12" r="3"/><path d="M12 2a4 4 0 014 4 4 4 0 01-4 4 4 4 0 01-4-4 4 4 0 014-4z"/><path d="M12 14a4 4 0 014 4 4 4 0 01-4 4 4 4 0 01-4-4 4 4 0 014-4z"/><path d="M2 12a4 4 0 014-4 4 4 0 014 4 4 4 0 01-4 4 4 4 0 01-4-4z"/><path d="M14 12a4 4 0 014-4 4 4 0 014 4 4 4 0 01-4 4 4 4 0 01-4-4z"/></svg>
+                <span>Bloom</span>
+              </button>
             </div>
-
             <div class="toggle-row">
               <span class="toggle-label">Light background</span>
               <label class="switch">
@@ -47,49 +65,116 @@
             </div>
           </div>
 
-          <!-- Upload -->
+          <!-- Audio source -->
           <div class="section">
-            <div class="section-label">Add an audio file</div>
-            <label class="file-btn pill">
-              <span>Choose file</span>
-              <input id="audioFile" type="file" accept="audio/*" />
-            </label>
+            <div class="section-label">Audio source</div>
+
+            <!-- Source tabs -->
+            <div class="source-tabs">
+              <button class="source-tab is-active" id="tabUpload" type="button">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 17v1a2 2 0 002 2h12a2 2 0 002-2v-1"/><polyline points="8 12 12 8 16 12"/><line x1="12" y1="8" x2="12" y2="17"/></svg>
+                Upload
+              </button>
+              <button class="source-tab" id="tabRecord" type="button">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10a7 7 0 0014 0"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                Record
+              </button>
+            </div>
+
+                    <!-- Upload panel -->
+            <div id="uploadPanel">
+              <label class="file-zone" id="fileZoneLabel">
+                <!-- Default state -->
+                <div class="file-zone-body" id="fileZoneDefault">
+                  <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round">
+                    <path d="M4 17v1a2 2 0 002 2h12a2 2 0 002-2v-1"/>
+                    <polyline points="8 12 12 8 16 12"/>
+                    <line x1="12" y1="8" x2="12" y2="17"/>
+                  </svg>
+                  <span class="file-zone-label">Choose file</span>
+                  <span class="file-zone-hint">mp3 · wav · ogg · m4a</span>
+                </div>
+                <!-- Loaded state -->
+                <div class="file-zone-loaded" id="fileZoneLoaded">
+                  <div class="fz-art" id="fzArt">
+                    <img id="fzArtImg" class="fz-art-img" />
+                    <div id="fzArtPlaceholder" class="fz-art-placeholder">
+                      <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+                    </div>
+                  </div>
+                  <div class="fz-meta">
+                    <span id="fzName" class="fz-name"></span>
+                    <span id="fzDuration" class="fz-duration"></span>
+                  </div>
+                </div>
+                <input id="audioFile" type="file" accept="audio/*" />
+              </label>
+            </div>
+
+            <!-- Record panel -->
+            <div id="recordPanel" class="source-panel-hidden">
+              <!-- State 1 & 2: idle / recording button -->
+              <button id="recordBtn" class="btn-record" type="button">
+                <span class="record-dot"></span>
+                <span id="recordBtnLabel">Start Recording</span>
+                <span id="recordTimer" class="record-timer-inline">0:00</span>
+              </button>
+              <!-- State 3: recorded clip card -->
+              <div id="recordedCard" class="recorded-card recorded-card-hidden">
+                <div class="recorded-art">
+                  <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><rect x="9" y="2" width="6" height="13" rx="3"/><path d="M5 10a7 7 0 0014 0"/><line x1="12" y1="19" x2="12" y2="23"/><line x1="8" y1="23" x2="16" y2="23"/></svg>
+                </div>
+                <div class="recorded-meta">
+                  <span class="recorded-name">Audio recording</span>
+                  <span id="recordedDuration" class="recorded-duration">0:00</span>
+                </div>
+                <span class="recorded-hint">Tap to record a new audio</span>
+              </div>
+            </div>
           </div>
 
           <!-- Playback -->
           <div class="section">
-            <div class="section-label">Create your visual</div>
-            <div class="row3">
-              <button id="playBtn" class="btn pill" type="button">Play</button>
-              <button id="pauseBtn" class="btn pill" type="button">Pause</button>
-              <button id="restartBtn" class="btn pill" type="button">Restart</button>
+            <div class="section-label">Playback</div>
+            <div class="playback-controls">
+              <button id="playBtn" class="btn-play" type="button" data-state="play">
+                <svg id="playPauseIcon" width="12" height="12" viewBox="0 0 12 12" fill="currentColor"><path d="M2.5 2l8 4-8 4V2z"/></svg>
+                <span id="playPauseLabel">Play</span>
+              </button>
+              <button id="restartBtn" class="btn-ctrl" type="button">
+                <svg width="12" height="12" viewBox="0 0 12 12" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"><path d="M1.5 6A4.5 4.5 0 106 1.5"/><polyline points="1.5 1.5 1.5 6 6 6"/></svg>
+                Restart
+              </button>
             </div>
-
-            <div class="meta">
-              <div id="status">Upload an audio file to begin.</div>
-              <div id="nowPlaying"></div>
+            <div class="status-chip">
+              <span class="status-dot"></span>
+              <span id="status">Upload an audio file to begin.</span>
             </div>
+            <div id="nowPlaying" class="now-playing"></div>
           </div>
 
           <!-- Export -->
           <div class="section">
             <div class="section-label">Export</div>
-            <div class="row2">
-              <button id="addGalleryBtn" class="btn pill" type="button">Add to gallery</button>
-              <button id="saveBtn" class="btn pill primary" type="button">Save image</button>
+            <div class="export-row">
+              <button id="addGalleryBtn" class="btn-secondary" type="button">Add to gallery</button>
+              <button id="saveBtn" class="btn-primary" type="button">Save image</button>
             </div>
           </div>
 
           <!-- Gallery -->
-          <div class="section gallery-head">
-            <div class="gallery-title">Gallery</div>
-            <div class="sub-actions">
-              <button id="clearBtn" class="btn pill ghost" type="button">Clear</button>
-              <button id="exportBtn" class="btn pill ghost" type="button">Export</button>
+          <div class="section gallery-section">
+            <div class="gallery-bar">
+              <span class="gallery-heading">Gallery</span>
+              <div class="gallery-actions">
+                <button id="clearBtn" class="btn-ghost" type="button">Clear</button>
+                <button id="exportBtn" class="btn-ghost" type="button">Export</button>
+              </div>
             </div>
           </div>
 
           <div id="gallery" class="gallery"></div>
+
         </div>
       </aside>
     </div>

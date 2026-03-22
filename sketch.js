@@ -36,6 +36,7 @@
     finished: false,
     paused: false,
     pauseTime: 0,
+    playStartedAt: 0,
     filename: "",
     onStatus: () => {},
     onEnded: () => {},
@@ -252,6 +253,12 @@
         }
 
         p.pop();
+
+        // Detect natural audio end each frame (avoids p5.sound onended race condition)
+        if (!state.soundFile.isPlaying() && !state.paused) {
+          const elapsed = p.millis() - state.playStartedAt;
+          if (elapsed > 300) finalize();
+        }
       };
 
       /* ---------- helpers ---------- */
@@ -260,11 +267,7 @@
         bgClear();
       }
 
-      let playGen = 0;
-
-      function finalize(gen) {
-        // Ignore stale onended from a previous play/stop cycle
-        if (gen !== playGen) return;
+      function finalize() {
         if (state.paused) return;
 
         state.finished = true;
@@ -341,14 +344,11 @@
           state.finished = false;
           state.paused = false;
           state.pauseTime = 0;
-
-          const gen = ++playGen;
+          state.playStartedAt = p.millis();
 
           state.soundFile.stop();
           state.soundFile.play();
           state.soundFile.setLoop(false);
-
-          state.soundFile.onended(() => finalize(gen));
 
           state.onStatus("Generating…");
         },
@@ -367,10 +367,9 @@
           state.paused = false;
           state.finished = false;
           state.started = true;
+          state.playStartedAt = p.millis();
           p.userStartAudio();
-          const gen = ++playGen;
           state.soundFile.play(0, 1, 1, state.pauseTime);
-          state.soundFile.onended(() => finalize(gen));
           state.onStatus("Generating…");
         },
 

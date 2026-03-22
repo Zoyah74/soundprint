@@ -383,6 +383,7 @@ window.addEventListener("DOMContentLoaded", () => {
     });
 
     restartBtn.addEventListener("click", () => {
+      isPaused = false;
       window.FingerprintApp.play();
       setPauseState();
       setDotGenerating();
